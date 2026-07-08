@@ -51,7 +51,7 @@ prompt_password() {
 }
 
 hash_password() {
-  local password="$1" hash
+  local password="$1" hash encoded
   if command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1; then
     if hash="$(printf '%s\n' "$password" | docker run --rm -i "$CADDY_IMAGE" caddy hash-password 2>/dev/null)"; then
       printf '%s\n' "$hash"
@@ -59,10 +59,8 @@ hash_password() {
     fi
     echo "local Docker hashing failed; retrying on $REMOTE" >&2
   fi
-  printf '%s' "$password" \
-    | base64 \
-    | tr -d '\n' \
-    | ssh -T "$REMOTE" "encoded=\$(cat); { printf '%s' \"\$encoded\" | base64 -d; printf '\n'; } | docker run --rm -i '$CADDY_IMAGE' caddy hash-password"
+  encoded="$(printf '%s' "$password" | base64 | tr -d '\n')"
+  ssh "$REMOTE" "docker run --rm -e PASSWORD_B64='$encoded' '$CADDY_IMAGE' sh -c 'password=\$(printf %s \"\$PASSWORD_B64\" | base64 -d); caddy hash-password --plaintext \"\$password\"'"
 }
 
 write_user() {
