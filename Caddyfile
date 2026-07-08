@@ -1,0 +1,41 @@
+{
+	email {$LETSENCRYPT_EMAIL}
+	admin off
+}
+
+{$BARLEY_DOMAIN} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "same-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		-Server
+	}
+
+	basicauth {
+		yboily {$CADDY_YBOILY_PASSWORD_HASH}
+	}
+
+	handle_path /stream* {
+		reverse_proxy motion:8081
+	}
+
+	handle /motion-control* {
+		respond "Motion web control is intentionally not exposed." 403
+	}
+
+	handle_path /recordings/* {
+		root * /srv/recordings
+		file_server browse
+	}
+
+	handle /healthz {
+		respond "ok" 200
+	}
+
+	root * /srv/www
+	file_server
+}

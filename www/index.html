@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Barley Vision</title>
+  <link rel="stylesheet" href="/assets/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>Barley Vision</h1>
+      <p id="last-updated">Status loading...</p>
+    </div>
+    <a class="button" href="/recordings/">Browse Recordings</a>
+  </header>
+
+  <main class="layout">
+    <section class="panel live">
+      <h2>Live Stream</h2>
+      <img src="/stream" alt="Live webcam stream">
+    </section>
+
+    <section class="panel">
+      <h2>Status</h2>
+      <dl class="status-grid">
+        <dt>Camera</dt><dd id="camera-status">Unknown</dd>
+        <dt>Motion</dt><dd id="motion-status">Unknown</dd>
+        <dt>Recordings</dt><dd id="recording-count">Unknown</dd>
+        <dt>Storage Used</dt><dd id="storage-used">Unknown</dd>
+        <dt>Drive Free</dt><dd id="drive-free">Unknown</dd>
+      </dl>
+    </section>
+
+    <section class="panel recent">
+      <div class="section-title">
+        <h2>Recent Motion Events</h2>
+        <a href="/recordings/">All files</a>
+      </div>
+      <div id="recent-events" class="events"></div>
+    </section>
+  </main>
+
+  <script src="/assets/app.js"></script>
+</body>
+</html>

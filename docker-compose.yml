@@ -1,0 +1,98 @@
+services:
+  caddy:
+    image: caddy:2-alpine
+    container_name: barley-vision-caddy
+    restart: unless-stopped
+    depends_on:
+      motion:
+        condition: service_started
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      BARLEY_DOMAIN: ${BARLEY_DOMAIN:-barley.boily.me}
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL:?Set LETSENCRYPT_EMAIL in .env.local}
+      CADDY_YBOILY_PASSWORD_HASH: ${CADDY_YBOILY_PASSWORD_HASH:?Set CADDY_YBOILY_PASSWORD_HASH in .env.local}
+    volumes:
+      - type: bind
+        source: ./Caddyfile
+        target: /etc/caddy/Caddyfile
+        read_only: true
+      - type: bind
+        source: ./www
+        target: /srv/www
+        read_only: true
+      - type: bind
+        source: ${HOST_RECORDINGS_DIR:?Set HOST_RECORDINGS_DIR in .env.local}
+        target: /srv/recordings
+        read_only: true
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - barley_internal
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+
+  motion:
+    build:
+      context: ./motion
+    container_name: barley-vision-motion
+    restart: unless-stopped
+    devices:
+      - /dev/video0:/dev/video0
+    environment:
+      RECORDINGS_URL_BASE: https://${BARLEY_DOMAIN:-barley.boily.me}/recordings
+      RECORDINGS_DIR: /recordings
+      WEB_API_DIR: /www/api
+      SMTP_HOST: ${SMTP_HOST:?Set SMTP_HOST in .env.local}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_TLS: ${SMTP_TLS:-on}
+      SMTP_STARTTLS: ${SMTP_STARTTLS:-on}
+      SMTP_USER: ${SMTP_USER:?Set SMTP_USER in .env.local}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:?Set SMTP_PASSWORD in .env.local}
+      SMTP_FROM: ${SMTP_FROM:?Set SMTP_FROM in .env.local}
+      SMTP_TO: ${SMTP_TO:?Set SMTP_TO in .env.local}
+      MAX_RECORDING_BYTES: ${MAX_RECORDING_BYTES:-34359738368}
+      MIN_RECORDING_AGE_HOURS: ${MIN_RECORDING_AGE_HOURS:-24}
+    volumes:
+      - type: bind
+        source: ./motion/motion.conf
+        target: /etc/motion/motion.conf
+        read_only: true
+      - type: bind
+        source: ./scripts
+        target: /usr/local/barley-vision/scripts
+        read_only: true
+      - type: bind
+        source: ./www/api
+        target: /www/api
+      - type: bind
+        source: ${HOST_RECORDINGS_DIR:?Set HOST_RECORDINGS_DIR in .env.local}
+        target: /recordings
+    networks:
+      - barley_internal
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    user: "1000:1000"
+    group_add:
+      - "44"
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep motion >/dev/null && test -e /dev/video0"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+networks:
+  barley_internal:
+    driver: bridge
+    internal: false
+
+volumes:
+  caddy_data:
+  caddy_config:
