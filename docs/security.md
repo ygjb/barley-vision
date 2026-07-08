@@ -2,8 +2,9 @@
 
 - Only Caddy publishes host ports. Motion is reachable only on the Docker network.
 - The whole site is protected with Caddy Basic Authentication.
-- Use Caddy password hashes, not plaintext passwords.
-- Keep `.env.local` out of Git because it contains SMTP credentials and password hashes.
+- Use Caddy password hashes, not plaintext passwords. Manage them with `scripts/manage-caddy-users.sh`.
+- Keep `.env.local` out of Git because it contains SMTP and DNS credentials.
+- Keep `caddy/users.htpasswd` out of Git because it contains Basic Auth password hashes.
 - The Caddy container runs read-only with `no-new-privileges`.
 - The Motion container drops Linux capabilities and only receives `/dev/video0`.
 - The Docker socket is not mounted into any container.

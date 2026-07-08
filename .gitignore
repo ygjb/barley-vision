@@ -1,5 +1,6 @@
 .env
 .env.local
 .DS_Store
+caddy/users.htpasswd
 recordings/*
 !recordings/.gitkeep

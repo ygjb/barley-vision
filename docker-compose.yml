@@ -12,11 +12,14 @@ services:
     environment:
       BARLEY_DOMAIN: ${BARLEY_DOMAIN:-barley.boily.me}
       LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL:?Set LETSENCRYPT_EMAIL in .env.local}
-      CADDY_YBOILY_PASSWORD_HASH: ${CADDY_YBOILY_PASSWORD_HASH:?Set CADDY_YBOILY_PASSWORD_HASH in .env.local}
     volumes:
       - type: bind
         source: ./Caddyfile
         target: /etc/caddy/Caddyfile
+        read_only: true
+      - type: bind
+        source: ./caddy/users.htpasswd
+        target: /etc/caddy/users.htpasswd
         read_only: true
       - type: bind
         source: ./www

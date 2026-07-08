@@ -32,10 +32,10 @@ chmod +x scripts/*.sh motion/docker-entrypoint.sh
 
 4. Copy this project to `/srv/barley-vision`.
 5. Create `.env.local` from `.env.example` and fill in the values.
-6. Generate Caddy password hashes:
+6. Add the first Basic Auth user:
 
 ```sh
-docker run --rm caddy:2-alpine caddy hash-password --plaintext 'your-password'
+scripts/manage-caddy-users.sh add yboily
 ```
 
 7. Start the stack:
@@ -62,14 +62,22 @@ Important `.env.local` values:
 - `HOST_RECORDINGS_DIR`: host path for recordings, currently `/media/yboily/New Volume/recordings`.
 - `NAME_CHEAP_DNS_PASSWORD`: Namecheap Dynamic DNS password for updating `barley.boily.me`.
 - `LETSENCRYPT_EMAIL`: email for Let's Encrypt account notices.
-- `CADDY_YBOILY_PASSWORD_HASH`: Caddy Basic Auth hash for the `yboily` user.
 - `SMTP_*`: SMTP settings used by `msmtp`.
 - `MAX_RECORDING_BYTES`: recording storage limit. The default is 32 GiB.
 - `MIN_RECORDING_AGE_HOURS`: files younger than this are never deleted by cleanup.
 
 The Motion camera settings live in `motion/motion.conf`. Defaults target 1280x720 at 15 fps for reliability.
 
-To add another user later, generate another Caddy hash, add a new environment variable in `.env.local`, and add another `username {$VARIABLE_NAME}` line inside the `basicauth` block in `Caddyfile`.
+Manage Basic Auth users with:
+
+```sh
+scripts/manage-caddy-users.sh add yboily
+scripts/manage-caddy-users.sh add daughter
+scripts/manage-caddy-users.sh delete daughter
+scripts/manage-caddy-users.sh list
+```
+
+The script prompts for passwords, hashes them with Caddy, stores only hashes in `caddy/users.htpasswd`, uploads that file to the Pi, and recreates the Caddy container. `caddy/users.htpasswd` is ignored by Git.
 
 ## Operation
 

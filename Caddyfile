@@ -16,7 +16,7 @@
 	}
 
 	basic_auth {
-		yboily {$CADDY_YBOILY_PASSWORD_HASH}
+		import /etc/caddy/users.htpasswd
 	}
 
 	handle_path /stream* {
