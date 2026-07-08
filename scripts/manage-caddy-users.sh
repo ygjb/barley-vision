@@ -59,7 +59,10 @@ hash_password() {
     fi
     echo "local Docker hashing failed; retrying on $REMOTE" >&2
   fi
-  printf '%s\n' "$password" | ssh "$REMOTE" "docker run --rm -i '$CADDY_IMAGE' caddy hash-password"
+  printf '%s' "$password" \
+    | base64 \
+    | tr -d '\n' \
+    | ssh -T "$REMOTE" "encoded=\$(cat); { printf '%s' \"\$encoded\" | base64 -d; printf '\n'; } | docker run --rm -i '$CADDY_IMAGE' caddy hash-password"
 }
 
 write_user() {
