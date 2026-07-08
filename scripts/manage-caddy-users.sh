@@ -42,9 +42,9 @@ ensure_users_file() {
 prompt_password() {
   local first second
   read -r -s -p "Password: " first
-  echo
+  echo >&2
   read -r -s -p "Confirm password: " second
-  echo
+  echo >&2
   [[ -n "$first" ]] || die "password cannot be empty"
   [[ "$first" == "$second" ]] || die "passwords do not match"
   printf '%s\n' "$first"
