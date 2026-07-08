@@ -63,7 +63,7 @@ Important `.env.local` values:
 - `NAME_CHEAP_DNS_PASSWORD`: Namecheap Dynamic DNS password for updating `barley.boily.me`.
 - `LETSENCRYPT_EMAIL`: email for Let's Encrypt account notices.
 - `SMTP_*`: SMTP settings used by `msmtp`.
-- `MAX_RECORDING_BYTES`: recording storage limit. The default is 32 GiB.
+- `MAX_RECORDING_BYTES`: recording storage limit. The default is 500 GiB.
 - `MIN_RECORDING_AGE_HOURS`: files younger than this are never deleted by cleanup.
 
 The Motion camera settings live in `motion/motion.conf`. Defaults target 1280x720 at 15 fps for reliability.
@@ -127,7 +127,7 @@ Recommended host cron entry:
 15 * * * * cd /srv/barley-vision && docker compose --env-file .env.local exec -T motion /usr/local/barley-vision/scripts/cleanup-recordings.sh >/var/log/barley-vision-cleanup.log 2>&1
 ```
 
-Cleanup deletes the oldest MP4/JPEG files first when usage exceeds 32 GiB. Files newer than `MIN_RECORDING_AGE_HOURS` are kept.
+Cleanup deletes the oldest MP4/JPEG files first when usage exceeds 500 GiB. Files newer than `MIN_RECORDING_AGE_HOURS` are kept.
 
 ## Updating
 

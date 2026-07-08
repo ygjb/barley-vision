@@ -58,7 +58,7 @@ services:
       SMTP_PASSWORD: ${SMTP_PASSWORD:?Set SMTP_PASSWORD in .env.local}
       SMTP_FROM: ${SMTP_FROM:?Set SMTP_FROM in .env.local}
       SMTP_TO: ${SMTP_TO:?Set SMTP_TO in .env.local}
-      MAX_RECORDING_BYTES: ${MAX_RECORDING_BYTES:-34359738368}
+      MAX_RECORDING_BYTES: ${MAX_RECORDING_BYTES:-536870912000}
       MIN_RECORDING_AGE_HOURS: ${MIN_RECORDING_AGE_HOURS:-24}
     volumes:
       - type: bind

@@ -2,7 +2,7 @@
 set -eu
 
 recordings_dir="${RECORDINGS_DIR:-/media/yboily/New Volume/recordings}"
-max_bytes="${MAX_RECORDING_BYTES:-34359738368}"
+max_bytes="${MAX_RECORDING_BYTES:-536870912000}"
 min_age_hours="${MIN_RECORDING_AGE_HOURS:-24}"
 
 if [ ! -d "$recordings_dir" ]; then
