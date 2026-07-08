@@ -85,7 +85,7 @@ services:
     group_add:
       - "44"
     healthcheck:
-      test: ["CMD-SHELL", "/usr/local/barley-vision/scripts/write-status.sh; pgrep motion >/dev/null && test -e /dev/video0"]
+      test: ["CMD-SHELL", "/usr/local/barley-vision/scripts/index-recordings.sh; /usr/local/barley-vision/scripts/write-status.sh; pgrep motion >/dev/null && test -e /dev/video0"]
       interval: 30s
       timeout: 5s
       retries: 3

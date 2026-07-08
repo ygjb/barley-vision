@@ -50,6 +50,10 @@ trap 'rm -f "$tmp_mail"' EXIT
   printf -- '--%s--\n' "$boundary"
 } > "$tmp_mail"
 
-msmtp "$smtp_to" < "$tmp_mail"
 "$(dirname "$0")/index-recordings.sh" || true
 "$(dirname "$0")/write-status.sh" || true
+
+if ! msmtp "$smtp_to" < "$tmp_mail"; then
+  echo "failed to send motion notification email" >&2
+  exit 1
+fi
