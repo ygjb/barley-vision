@@ -5,7 +5,7 @@ PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 USERS_FILE="${BARLEY_USERS_FILE:-$PROJECT_DIR/caddy/users.htpasswd}"
 REMOTE="${BARLEY_REMOTE:-yboily@barley-vision}"
 REMOTE_DIR="${BARLEY_REMOTE_DIR:-/srv/barley-vision}"
-CADDY_IMAGE="${CADDY_IMAGE:-caddy:2-alpine}"
+CADDY_IMAGE="${CADDY_IMAGE:-docker.io/library/caddy:2-alpine}"
 
 usage() {
   cat <<'EOF'
@@ -19,7 +19,7 @@ Environment overrides:
   BARLEY_REMOTE      SSH target, default yboily@barley-vision
   BARLEY_REMOTE_DIR  Remote project directory, default /srv/barley-vision
   BARLEY_USERS_FILE  Local users file, default ./caddy/users.htpasswd
-  CADDY_IMAGE        Caddy image used for hashing, default caddy:2-alpine
+  CADDY_IMAGE        Caddy image used for hashing, default docker.io/library/caddy:2-alpine
 EOF
 }
 
@@ -51,12 +51,15 @@ prompt_password() {
 }
 
 hash_password() {
-  local password="$1"
+  local password="$1" hash
   if command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1; then
-    printf '%s\n' "$password" | docker run --rm -i "$CADDY_IMAGE" caddy hash-password
-  else
-    printf '%s\n' "$password" | ssh "$REMOTE" "docker run --rm -i '$CADDY_IMAGE' caddy hash-password"
+    if hash="$(printf '%s\n' "$password" | docker run --rm -i "$CADDY_IMAGE" caddy hash-password 2>/dev/null)"; then
+      printf '%s\n' "$hash"
+      return
+    fi
+    echo "local Docker hashing failed; retrying on $REMOTE" >&2
   fi
+  printf '%s\n' "$password" | ssh "$REMOTE" "docker run --rm -i '$CADDY_IMAGE' caddy hash-password"
 }
 
 write_user() {
