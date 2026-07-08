@@ -60,6 +60,7 @@ Important `.env.local` values:
 
 - `BARLEY_DOMAIN`: public hostname, currently `barley.boily.me`.
 - `HOST_RECORDINGS_DIR`: host path for recordings, currently `/media/yboily/New Volume/recordings`.
+- `NAME_CHEAP_DNS_PASSWORD`: Namecheap Dynamic DNS password for updating `barley.boily.me`.
 - `LETSENCRYPT_EMAIL`: email for Let's Encrypt account notices.
 - `CADDY_YBOILY_PASSWORD_HASH`: Caddy Basic Auth hash for the `yboily` user.
 - `SMTP_*`: SMTP settings used by `msmtp`.
@@ -171,6 +172,13 @@ docker compose --env-file .env.local exec motion sh -lc 'printf "Subject: test\n
 ```
 
 If HTTPS fails, verify that public DNS points to the home Internet connection and that the router forwards ports 80 and 443 to the Pi.
+
+Check dynamic DNS on the Pi:
+
+```sh
+sudo systemctl status ddclient
+dig @dns1.registrar-servers.com barley.boily.me A +short
+```
 
 ## Architecture
 
